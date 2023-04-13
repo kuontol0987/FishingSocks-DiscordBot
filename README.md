@@ -5,3 +5,7 @@ This is a minigame bot for discord.
 npm i discord.js  
 npm i mongoose  
 npm i dotenv  
+npm i nodemon
+
+# Run Bot
+nodemon
