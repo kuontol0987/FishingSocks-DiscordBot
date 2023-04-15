@@ -1,7 +1,3 @@
-// TODO
-// LEILÃO
-// PROCURAR E CORRIGIR BUGS
-
 const { Client, IntentsBitField } = require('discord.js');
 require('dotenv').config();
 
