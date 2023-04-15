@@ -25,6 +25,8 @@ intents: [
 
 client.on('ready', () => {
     console.log(`Sock Fishing Game is online! ( ` + client.user.tag + ' )');
+
+    client.user.setActivity('Sock Fishing Minigame', { type: 0});
 });
 
 const mongoose = require('mongoose');
@@ -49,7 +51,7 @@ const Player = mongoose.model('Player', playerSchema);
 const prefix = '?';
 
 const rarities = [
-  { name: 'Nigga', probability: 0.0809, price: 0 },
+  { name: 'Trash', probability: 0.0809, price: 0 },
   { name: 'Common', probability: 0.409, price: 1 },
   { name: 'Uncommon', probability: 0.25, price: 2 },
   { name: 'Rare', probability: 0.2, price: 4 },
@@ -59,12 +61,12 @@ const rarities = [
 ];
 
 const shopItems = [
-  { name: 'Timeout Token 60sec', price: 100, type: 'timeoutToken60sec', duration: 60 },
-  { name: 'Timeout Token 5min', price: 400, type: 'timeoutToken5min', duration: 300 },
-  { name: 'Timeout Token 10min', price: 700, type: 'timeoutToken10min', duration: 600 },
-  { name: 'Timeout Token 1hour', price: 3500, type: 'timeoutToken1hour', duration: 3600 },
+  { name: 'Timeout Token 60sec', price: 100, type: 'timeoutToken60sec' },
+  { name: 'Timeout Token 5min', price: 400, type: 'timeoutToken5min' },
+  { name: 'Timeout Token 10min', price: 700, type: 'timeoutToken10min' },
+  { name: 'Timeout Token 1hour', price: 3500, type: 'timeoutToken1hour' },
   { name: 'Server Kick', price: 250, type: 'serverKick' },
-  { name: 'Server Ban', price: 100000, type: 'serverBan' }
+  { name: 'Server Ban', price: 500000, type: 'serverBan' }
 ];
 
 const cooldowns = new Set();
@@ -100,7 +102,7 @@ client.on('messageCreate', async (message) => {
     const roleNoBot = message.guild.roles.cache.find(role => role.name === 'L ROLE (No Fish For You)');
 
     if (message.member.roles.cache.has(roleNoBot.id)) {
-      return message.reply('You cannot use bot commands nigga.');
+      return message.reply('You cannot use bot commands.');
     }
   
     if (!player) {
@@ -116,7 +118,7 @@ client.on('messageCreate', async (message) => {
       cooldowns.add(playerId);
       setTimeout(() => {
         cooldowns.delete(playerId);
-      }, 15000);
+      }, 15000); // 15000
     
       const rarityIndex = weightedRandom(rarities);
       const sock = rarities[rarityIndex];
@@ -144,7 +146,7 @@ client.on('messageCreate', async (message) => {
     
       for (let i = 0; i < inventory.length; i++) {
         const rarity = rarities.find(rarity => rarity.name === inventory[i]);
-        totalPrice += rarity.price / 2;
+        totalPrice += rarity.price; // / 2
       }
     
       player.socksSold += socksFished;
@@ -164,7 +166,7 @@ client.on('messageCreate', async (message) => {
         Timeout Token 10min - 700$
         Timeout Token 1hour - 3500$
         Server Kick - 250$
-        Server Ban - 100000$
+        Server Ban - 500000$
       `);
     }
 
@@ -210,7 +212,7 @@ client.on('messageCreate', async (message) => {
       const mention = message.mentions.members.first();
 
       if (mention && mention.roles.cache.has(roleNoBot.id)) {
-        return message.reply(`You cannot use bot commands on ${mention} cause he is a nigga.`);
+        return message.reply(`You cannot use bot commands on ${mention}.`);
       }
 
       if (!mention) {
@@ -260,7 +262,7 @@ client.on('messageCreate', async (message) => {
       const mention = message.mentions.members.first();
 
       if (mention.roles.cache.has(roleNoBot.id)) {
-        return message.reply(`You cannot use bot commands on ${mention} cause he is a nigga.`);
+        return message.reply(`You cannot use bot commands on ${mention}.`);
       }
       
       if (!mention) {
@@ -269,7 +271,7 @@ client.on('messageCreate', async (message) => {
     
       mention.kick('You have been kicked!').then(() => {
         message.channel.send(`${mention} has been kicked from the server!`);
-        console.log(`${player} kicked ${mention} from the server.`);
+        console.log(`${player} kicked ${mention.user.tag} from the server.`);
         const index = items.indexOf('Server Kick');
         player.items.splice(index, 1);
         player.save();
@@ -290,7 +292,7 @@ client.on('messageCreate', async (message) => {
       const mention = message.mentions.members.first();
 
       if (mention.roles.cache.has(roleNoBot.id)) {
-        return message.reply(`You cannot use bot commands on ${mention} cause he is a nigga.`);
+        return message.reply(`You cannot use bot commands on ${mention}.`);
       }
       
       if (!mention) {
@@ -299,7 +301,7 @@ client.on('messageCreate', async (message) => {
     
       mention.ban({ reason: 'You have been banned!' }).then(() => {
         message.channel.send(`${mention} has been banned from the server!`);
-        console.log(`${player} banned ${mention} from the server.`);
+        console.log(`${player} banned ${mention.user.tag} from the server.`);
         const index = items.indexOf('Server Ban');
         player.items.splice(index, 1);
         player.save();
@@ -322,7 +324,7 @@ client.on('messageCreate', async (message) => {
       const mention = message.mentions.members.first();
 
       if (mention.roles.cache.has(roleNoBot.id)) {
-        return message.reply(`You cannot use bot commands on ${mention} cause he is a nigga.`);
+        return message.reply(`You cannot use bot commands on ${mention}.`);
       }
     
       if (!mention) {
@@ -335,7 +337,7 @@ client.on('messageCreate', async (message) => {
     
       mention.timeout(duration, 'You have been timeouted!').then(() => {
         message.channel.send(`${mention} has been timed out for 60 seconds!`);
-        console.log(`${playerTag} timeouted ${mention} for 60sec.`);
+        console.log(`${playerTag} timeouted ${mention.user.tag} for 60sec.`);
         const index = items.indexOf('Timeout Token 60sec');
         player.items.splice(index, 1);
         player.save();
@@ -360,7 +362,7 @@ client.on('messageCreate', async (message) => {
       const mention = message.mentions.members.first();
 
       if (mention.roles.cache.has(roleNoBot.id)) {
-        return message.reply(`You cannot use bot commands on ${mention} cause he is a nigga.`);
+        return message.reply(`You cannot use bot commands on ${mention}.`);
       }
     
       if (!mention) {
@@ -373,7 +375,7 @@ client.on('messageCreate', async (message) => {
     
       mention.timeout(duration, 'You have been timeouted!').then(() => {
         message.channel.send(`${mention} has been timed out for 5 minutes!`);
-        console.log(`${playerTag} timeouted ${mention} for 5min.`);
+        console.log(`${playerTag} timeouted ${mention.user.tag} for 5min.`);
         const index = items.indexOf('Timeout Token 5min');
         player.items.splice(index, 1);
         player.save();
@@ -398,7 +400,7 @@ client.on('messageCreate', async (message) => {
       const mention = message.mentions.members.first();
 
       if (mention.roles.cache.has(roleNoBot.id)) {
-        return message.reply(`You cannot use bot commands on ${mention} cause he is a nigga.`);
+        return message.reply(`You cannot use bot commands on ${mention}.`);
       }
     
       if (!mention) {
@@ -411,7 +413,7 @@ client.on('messageCreate', async (message) => {
     
       mention.timeout(duration, 'You have been timeouted!').then(() => {
         message.channel.send(`${mention} has been timed out for 10 minutes!`);
-        console.log(`${playerTag} timeouted ${mention} for 10min.`);
+        console.log(`${playerTag} timeouted ${mention.user.tag} for 10min.`);
         const index = items.indexOf('Timeout Token 10min');
         player.items.splice(index, 1);
         player.save();
@@ -436,7 +438,7 @@ client.on('messageCreate', async (message) => {
       const mention = message.mentions.members.first();
 
       if (mention.roles.cache.has(roleNoBot.id)) {
-        return message.reply(`You cannot use bot commands on ${mention} cause he is a nigga.`);
+        return message.reply(`You cannot use bot commands on ${mention}.`);
       }
     
       if (!mention) {
@@ -449,7 +451,7 @@ client.on('messageCreate', async (message) => {
     
       mention.timeout(duration, 'You have been timeouted!').then(() => {
         message.channel.send(`${mention} has been timed out for 1 hour!`);
-        console.log(`${playerTag} timeouted ${mention} for 1 hour.`);
+        console.log(`${playerTag} timeouted ${mention.user.tag} for 1 hour.`);
         const index = items.indexOf('Timeout Token 1 hour');
         player.items.splice(index, 1);
         player.save();
@@ -494,7 +496,7 @@ client.on('messageCreate', async (message) => {
     if (command === 'rarities') {
       return message.channel.send(`
         **Rarities**
-        Nigga - 8.09% - 0$
+        Trash - 8.09% - 0$
         Common - 40.9% - 1$
         Uncommon - 25% - 2$
         Rare - 20% - 5$
@@ -508,7 +510,7 @@ client.on('messageCreate', async (message) => {
       const receiver = message.mentions.members.first();
 
       if (receiver.roles.cache.has(roleNoBot.id)) {
-        return message.reply(`You cannot use bot commands on ${receiver} cause he is a nigga.`);
+        return message.reply(`You cannot use bot commands on ${receiver}.`);
       }
 
       if (!receiver) {
@@ -554,7 +556,7 @@ client.on('messageCreate', async (message) => {
         ?leaderboardsocks - Show sock leaderboard
         ?rarities - Show socks info
         ?send <ammount> <@user> - Give the mentioned user the selected ammount of money
-        ?coinflip <ammount> <@user> - Challanges the mentioned player for a coinflip
+        ?coinflip <ammount> <@user> - Challenges the mentioned player for a coinflip
         ?help - Show this message
       `);
     }
@@ -563,7 +565,7 @@ client.on('messageCreate', async (message) => {
       const opponent = message.mentions.members.first();
 
       if (opponent.roles.cache.has(roleNoBot.id)) {
-        return message.reply(`You cannot use bot commands on ${opponent} cause he is a nigga.`);
+        return message.reply(`You cannot use bot commands on ${opponent}.`);
       }
 
       if (!opponent) {
@@ -586,7 +588,7 @@ client.on('messageCreate', async (message) => {
         return message.reply(`${opponent} doesn't have a player profile yet.`);
       }
       if (playerId === opponentId) {
-        return message.reply(`You can't challange yourself.`)
+        return message.reply(`You can't challenge yourself.`)
       }
       if (opponentPlayer.money < betAmount) {
         return message.reply(`${opponent} doesn't have enough money to bet ${betAmount}$!`);
